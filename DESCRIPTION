@@ -9,9 +9,6 @@ Description: Use SPARQL to pose SELECT or UPDATE queries to an end-point.
 License: GPL-3
 Encoding: UTF-8
 Imports: XML, RCurl
-LazyLoad: yes
 Packaged: 2013-10-24 01:05:19 UTC; wrvhage
 NeedsCompilation: no
-Repository: CRAN
-Date/Publication: 2013-10-25 17:39:14
 RoxygenNote: 7.1.1
