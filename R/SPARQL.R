@@ -1,7 +1,7 @@
-library(XML)
-library(RCurl)
-
+#' @export
 sparqlns <- c('s'='http://www.w3.org/2005/sparql-results#')
+
+#' @export
 commonns <- c('xsd','<http://www.w3.org/2001/XMLSchema#>',
               'rdf','<http://www.w3.org/1999/02/22-rdf-syntax-ns#>',
               'rdfs','<http://www.w3.org/2000/01/rdf-schema#>',
@@ -11,15 +11,15 @@ commonns <- c('xsd','<http://www.w3.org/2001/XMLSchema#>',
               'foaf','<http://xmlns.com/foaf/0.1/>',
               'wgs84','<http://www.w3.org/2003/01/geo/wgs84_pos#>',
               'qb','<http://purl.org/linked-data/cube#>')
-
+#' @export
 sparqltest <- function(...) {
   SPARQL(url='http://semanticweb.cs.vu.nl/lop/sparql/',
-         query='SELECT ?et ?r ?at ?t 
-                WHERE { 
+         query='SELECT ?et ?r ?at ?t
+                WHERE {
                   ?e sem:eventType ?et .
-                  ?e sem:hasActor ?a . 
-                  ?a sem:actorType ?at . 
-                  ?e sem:hasPlace ?p . 
+                  ?e sem:hasActor ?a .
+                  ?a sem:actorType ?at .
+                  ?e sem:hasPlace ?p .
                   ?p eez:inPiracyRegion ?r .
                   ?e sem:hasTimeStamp ?t . }',
          ns=c('lop','<http://semanticweb.cs.vu.nl/poseidon/ns/instances/>',
@@ -30,7 +30,10 @@ sparqltest <- function(...) {
 #
 # Read SPARQL results from end-point
 #
-SPARQL <- function(url="http://localhost/", query="", update="", 
+#' @export
+#' @import XML
+#' @import RCurl
+SPARQL <- function(url="http://localhost/", query="", update="",
                    ns=NULL, param="", extra=NULL, format="xml", curl_args=NULL, parser_args=NULL) {
   if (!is.null(extra)) {
     extrastr <- paste('&', sapply(seq(1,length(extra)),
@@ -56,7 +59,7 @@ SPARQL <- function(url="http://localhost/", query="", update="",
         attrs <- unlist(xpathApply(DOM,
                                    paste('//s:head/s:variable', sep=""),
                                    namespaces=sparqlns,
-                                   quote(xmlGetAttr(x, "name"))))			
+                                   quote(xmlGetAttr(x, "name"))))
         ns2 <- noBrackets(ns)
         res <- get_attr(attrs, DOM, ns2)
 
@@ -64,28 +67,28 @@ SPARQL <- function(url="http://localhost/", query="", update="",
 
 		rm(res)
         rm(DOM)
-        
+
         # FIXME: find neater way to unlist columns
         n = names(df)
         for(r in 1:length(n)) {
           name <- n[r]
           df[name] <- as.vector(unlist(df[name]))
         }
-        
+
       }
     } else if (format == 'csv') {
       tf <- do.call(getURL,append(list(url=paste(url, '?', param, '=', gsub('\\+','%2B',URLencode(query,reserved=TRUE)), extrastr, sep="")),
                                   curl_args))
       df <- do.call(readCSVstring,append(list(tf, blank.lines.skip=TRUE, strip.white=TRUE),
                                          parser_args))
-      if (!is.null(ns)) 
+      if (!is.null(ns))
         df <- dropNS(df,ns)
     } else if (format == 'tsv') {
       tf <- do.call(getURL,append(list(url=paste(url, '?', param, '=', gsub('\\+','%2B',URLencode(query,reserved=TRUE)), extrastr, sep="")),
                                   curl_args))
       df <- do.call(readTSVstring,append(list(tf, blank.lines.skip=TRUE, strip.white=TRUE),
                                          parser_args))
-      if (!is.null(ns)) 
+      if (!is.null(ns))
         df <- dropNS(df,ns)
     } else {
       cat('unknown format "',format,'"\n\n',sep="")
@@ -116,7 +119,7 @@ readCSVstring <- function(text, ...) {
 get_attr <- function(attrs, DOM, ns) {
   rs <- getNodeSet(DOM,'//s:result',namespaces=sparqlns)
   t(sapply(rs,
-           function(r) { 
+           function(r) {
              sapply(attrs,
                     function(attr) {
                       get_value(getNodeSet(xmlDoc(r),
@@ -236,7 +239,7 @@ interpret_type <- function(type, literal,ns) {
 }
 
 dropNS <- function(df,ns) {
-  data.frame(lapply(df, 
+  data.frame(lapply(df,
                     function(c) {
                       if(is.factor(c)) {
                         c <- as.character(c)
